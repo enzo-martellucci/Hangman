@@ -1,8 +1,7 @@
 import java.net.Socket;
 
-import java.io.PrintWriter;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 
 public class IO implements Runnable
 {
@@ -13,8 +12,8 @@ public class IO implements Runnable
 	// Attributes
 	private Server server;
 
-	private PrintWriter    output;
-	private BufferedReader input ;
+	private ObjectOutputStream output;
+	private Object             buffer;
 
 	private String name;
 
@@ -26,12 +25,11 @@ public class IO implements Runnable
 
 		try
 		{
-			this.output = new PrintWriter   (s.getOutputStream(), true);
-			this.input  = new BufferedReader(new InputStreamReader(s.getInputStream()));
+			this.output      = new ObjectOutputStream(s.getOutputStream());
+			new Listener(this, new ObjectInputStream (s.getInputStream ()));
 		}
 		catch (Exception e){ e.printStackTrace(); }
 
-		new Listener(this, this.input);
 		new Thread(this).start();
 	}
 
@@ -43,7 +41,7 @@ public class IO implements Runnable
 	// Run methods
 	public void run()
 	{
-		this.name = this.receive();
+		this.name = (String) this.receive();
 		if (this.name == null)
 			return;
 		if (name.equals(""))
@@ -54,33 +52,33 @@ public class IO implements Runnable
 	
 	
 	// IO methods
-	public void send(String msg)
+	public void send(Object o)
 	{
 		try
 		{
-			this.output.println(msg);
+			this.output.writeObject(o);
 		}
 		catch (Exception e){ e.printStackTrace(); }
 	}
 
-	public synchronized String receive()
+	public synchronized Object receive()
 	{
-		String msg = null;
+		Object o = null;
 		try
 		{
 			this.wait  ();
-			msg = this.input.readLine();
+			o = this.buffer;
 			this.notify();
 		}
 		catch (Exception e){ e.printStackTrace(); }
-		return msg;
+		return o;
 	}
 
-	public synchronized void available()
+	public synchronized void available(Object o)
 	{
 		try
 		{
-			// wait(20) to stop wait when io disconnected while not receiving
+			this.buffer = o;
 			this.notify();
 			this.wait(20);
 		}
@@ -89,13 +87,12 @@ public class IO implements Runnable
 
 	public void disconnected()
 	{
+		this.available(null);
 		try
 		{
 			this.output.close();
-			this.input .close();
 		}
 		catch (Exception e){ e.printStackTrace(); }
-
 		if (this.name != null)
 			this.server.removeIO(this);
 	}

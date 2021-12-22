@@ -56,7 +56,5 @@ public class Server
 		Server s = new Server(6000, 3);
 		
 		s.waitPlayer();
-		while (true)
-			s.sendToAll(System.console().readLine());
 	}
 }

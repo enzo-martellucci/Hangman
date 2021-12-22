@@ -25,8 +25,6 @@ public class Client
 
 	public void printMessage()
 	{
-		String msg;
-
 		while (true)
 			System.out.println(this.io.receive());
 	}

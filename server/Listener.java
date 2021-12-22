@@ -1,14 +1,14 @@
-import java.io.BufferedReader;
+import java.io.ObjectInputStream;
 
 public class Listener implements Runnable
 {
 	// Attributes
-	private IO             io   ;
-	private BufferedReader input;
+	private IO                io   ;
+	private ObjectInputStream input;
 
 
 	// Constructor
-	public Listener(IO io, BufferedReader input)
+	public Listener(IO io, ObjectInputStream input)
 	{
 		this.io    = io   ;
 		this.input = input;
@@ -20,21 +20,11 @@ public class Listener implements Runnable
 	// Methods
 	public void run()
 	{
-		boolean connected = true;
-
 		try
 		{
-			while (connected)
-			{
-				this.input.mark(1);
-				if (this.input.read() == -1)
-					connected = false;
-				this.input.reset();
-				this.io.available();
-			}
-
-			this.io.disconnected();
+			while (true)
+				this.io.available(this.input.readObject());
 		}
-		catch (Exception e){ e.printStackTrace(); }
+		catch (Exception e){ this.io.disconnected(); }
 	}
 }
