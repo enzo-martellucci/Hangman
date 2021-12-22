@@ -81,8 +81,9 @@ public class IO implements Runnable
 	{
 		try
 		{
+			// wait(20) to stop wait when io disconnected while not receiving
 			this.notify();
-			this.wait(500);
+			this.wait(20);
 		}
 		catch (Exception e){ e.printStackTrace(); }
 	}
@@ -96,7 +97,8 @@ public class IO implements Runnable
 		}
 		catch (Exception e){ e.printStackTrace(); }
 
-		this.server.removeIO(this);
+		if (this.name != null)
+			this.server.removeIO(this);
 	}
 
 
