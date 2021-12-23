@@ -1,6 +1,13 @@
+// Architecture
+package hangmans.model;
+import hangmans.network.Receiver;
+import hangmans.network.IO;
+
+// Java import
 import java.util.List;
 import java.util.ArrayList;
 
+// Class
 public class Server
 {
 	// Attributes
@@ -20,6 +27,10 @@ public class Server
 	}
 
 
+	// Getters
+	public String getLstIO(){ return this.lstIO.toString(); }
+
+
 	// Connection methods
 	public synchronized void waitPlayer()
 	{
@@ -34,8 +45,6 @@ public class Server
 		}
 		catch (Exception e){ e.printStackTrace(); }
 		this.receiver.close();
-
-		System.out.println("All here : " + this.lstIO);
 	}
 
 	public synchronized void addIO   (IO io){ this.lstIO.add(io)   ; this.notify(); }
@@ -47,14 +56,5 @@ public class Server
 	{
 		for (IO io : this.lstIO)
 			io.send(msg);
-	}
-
-
-	// Main
-	public static void main(String[] args)
-	{
-		Server s = new Server(6000, 3);
-		
-		s.waitPlayer();
 	}
 }

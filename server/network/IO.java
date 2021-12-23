@@ -1,8 +1,13 @@
-import java.net.Socket;
+// Architecture
+package hangmans.network;
+import hangmans.model.Server;
 
+// Java import
+import java.net.Socket;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
 
+// Class
 public class IO implements Runnable
 {
 	// Sequential number

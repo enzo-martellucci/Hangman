@@ -1,6 +1,12 @@
+// Architecture
+package hangmans.network;
+import hangmans.model.Server;
+
+// Java import
 import java.net.Socket;
 import java.net.ServerSocket;
 
+// Class
 public class Receiver implements Runnable
 {
 	// Attributes

@@ -1,21 +1,26 @@
-import java.net.Socket;
+// Architecture
+package hangmanc.network;
+import hangmanc.Controller;
 
+// Java import
+import java.net.Socket;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream ;
 
+// Class
 public class IO
 {
 	// Attributes
-	private Client client;
+	private Controller ctrl;
 
 	private ObjectOutputStream output;
 	private Object             buffer;
 
 
 	// Constructor
-	public IO(Client client, Socket s)
+	public IO(Controller ctrl, Socket s)
 	{
-		this.client = client;
+		this.ctrl = ctrl;
 
 		try
 		{
@@ -67,6 +72,6 @@ public class IO
 			this.output.close();
 		}
 		catch (Exception e){ e.printStackTrace(); }
-		this.client.disconnected();
+		this.ctrl.disconnected();
 	}
 }

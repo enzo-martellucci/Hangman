@@ -1,5 +1,10 @@
+// Architecture
+package hangmanc.network;
+
+// Java import
 import java.io.ObjectInputStream;
 
+// Class
 public class Listener implements Runnable
 {
 	// Attributes
