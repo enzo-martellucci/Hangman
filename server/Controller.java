@@ -18,7 +18,6 @@ public class Controller
 		this.view   = new ViewCUI();
 
 		this.waitPlayer();
-		this.sendMessage();
 	}
 
 
@@ -27,12 +26,6 @@ public class Controller
 	{
 		this.server.waitPlayer();
 		this.view.print("All here : " + this.server.getLstIO());
-	}
-
-	private void sendMessage()
-	{
-		while (true)
-			this.server.sendToAll(this.view.enterMessage());
 	}
 
 

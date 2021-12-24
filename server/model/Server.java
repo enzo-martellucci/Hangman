@@ -6,29 +6,32 @@ import hangmans.network.IO;
 // Java import
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 // Class
 public class Server
 {
 	// Attributes
 	private Receiver receiver;
-	private int      capacity;
 
-	private List<IO> lstIO;
+	private IO     [] lstPlayer   ;
+	private boolean[] lstConnected;
+	private int nbPlayer;
 
 
 	// Constructor
 	public Server(int port, int capacity)
 	{
 		this.receiver = new Receiver(this, port);
-		this.capacity = capacity;
 
-		this.lstIO = new ArrayList<IO>();
+		this.lstPlayer    = new IO     [capacity];
+		this.lstConnected = new boolean[capacity];
+		this.nbPlayer = 0;
 	}
-
+	
 
 	// Getters
-	public String getLstIO(){ return this.lstIO.toString(); }
+	public String getLstIO(){ return Arrays.toString(this.lstPlayer); }
 
 
 	// Connection methods
@@ -37,24 +40,49 @@ public class Server
 		new Thread(this.receiver).start();
 		try
 		{
-			while (this.lstIO.size() != this.capacity)
+			while (this.nbPlayer != this.lstPlayer.length)
 			{
 				this.wait();
-				this.sendToAll(String.format("Waiting players (%d/%d)", this.lstIO.size(), this.capacity));
+				this.sendToAll(String.format("Waiting players (%d/%d)", this.nbPlayer, this.lstPlayer.length));
 			}
 		}
 		catch (Exception e){ e.printStackTrace(); }
 		this.receiver.close();
 	}
 
-	public synchronized void addIO   (IO io){ this.lstIO.add(io)   ; this.notify(); }
-	public synchronized void removeIO(IO io){ this.lstIO.remove(io); this.notify();	}
+	public synchronized void addPlayer(IO player)
+	{
+		int i = Server.indexOf(this.lstPlayer, null);
+		this.lstPlayer   [i] = player;
+		this.lstConnected[i] = true;
+		this.nbPlayer++;
+		this.notify();
+	}
+
+	public synchronized void removePlayer(IO player)
+	{
+		int i = Server.indexOf(this.lstPlayer, player);
+		this.lstPlayer   [i] = null ;
+		this.lstConnected[i] = false;
+		this.nbPlayer--;
+		this.notify();
+	}
 
 
 	// IO methods
-	public void sendToAll(String msg)
+	public void sendToAll(Object o)
 	{
-		for (IO io : this.lstIO)
-			io.send(msg);
+		for (int i = 0; i < this.lstPlayer.length; i++)
+			if (this.lstConnected[i])
+				this.lstPlayer[i].send(o);
+	}
+
+
+	// Utilitary methods
+	private static int indexOf(Object[] array, Object target)
+	{
+		int i = 0;
+		while (array[i] != target) i++;
+		return i;
 	}
 }

@@ -3,6 +3,5 @@
 ./client/view/ViewCUI.java
 
 ./client/network/IO.java
-./client/network/Listener.java
 
 ./client/Controller.java

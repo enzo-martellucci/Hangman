@@ -6,6 +6,8 @@ import hangmans.model.Server;
 import java.net.Socket;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
+import java.util.Queue;
+import java.util.LinkedList;
 
 // Class
 public class IO implements Runnable
@@ -17,8 +19,9 @@ public class IO implements Runnable
 	// Attributes
 	private Server server;
 
+	private Queue<Object>      buffer;
 	private ObjectOutputStream output;
-	private Object             buffer;
+	private ObjectInputStream  input ;
 
 	private String name;
 
@@ -27,14 +30,13 @@ public class IO implements Runnable
 	public IO(Server server, Socket s)
 	{
 		this.server = server;
-
 		try
 		{
-			this.output      = new ObjectOutputStream(s.getOutputStream());
-			new Listener(this, new ObjectInputStream (s.getInputStream ()));
+			this.buffer = new LinkedList<Object>();
+			this.output = new ObjectOutputStream(s.getOutputStream());
+			this.input  = new ObjectInputStream (s.getInputStream ());
 		}
 		catch (Exception e){ e.printStackTrace(); }
-
 		new Thread(this).start();
 	}
 
@@ -43,16 +45,24 @@ public class IO implements Runnable
 	public String getName(){ return this.name; }
 
 
+	// Setters
+	public void setName(String name)
+	{
+		this.name = name.equals("") ? "Anonymous" + IO.SEQ_NUM++ : name;
+		this.server.addPlayer(this);
+	}
+
+
 	// Run methods
 	public void run()
 	{
-		this.name = (String) this.receive();
-		if (this.name == null)
-			return;
-		if (name.equals(""))
-			this.name = "Anonymous" + (++IO.SEQ_NUM);
-
-		this.server.addIO(this);
+		try
+		{
+			this.setName((String) this.input.readObject());
+			while (true)
+				this.available(this.input.readObject());
+		}
+		catch (Exception e){ this.close(); }
 	}
 	
 	
@@ -68,38 +78,28 @@ public class IO implements Runnable
 
 	public synchronized Object receive()
 	{
-		Object o = null;
-		try
-		{
-			this.wait  ();
-			o = this.buffer;
-			this.notify();
-		}
-		catch (Exception e){ e.printStackTrace(); }
-		return o;
+		if (this.buffer.peek() == null)
+			try{ this.wait(); } catch (Exception e){ e.printStackTrace(); }
+		return this.buffer.poll();
 	}
 
-	public synchronized void available(Object o)
+	private synchronized void available(Object o)
+	{
+		this.buffer.offer(o);
+		this.notify();
+	}
+
+	private void close()
 	{
 		try
 		{
-			this.buffer = o;
-			this.notify();
-			this.wait(20);
-		}
-		catch (Exception e){ e.printStackTrace(); }
-	}
-
-	public void disconnected()
-	{
-		this.available(null);
-		try
-		{
+			this.available(null);
+			this.input .close();
 			this.output.close();
 		}
 		catch (Exception e){ e.printStackTrace(); }
 		if (this.name != null)
-			this.server.removeIO(this);
+			this.server.removePlayer(this);
 	}
 
 

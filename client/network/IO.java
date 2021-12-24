@@ -5,31 +5,47 @@ import hangmanc.Controller;
 // Java import
 import java.net.Socket;
 import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream ;
+import java.io.ObjectInputStream;
+import java.util.Queue;
+import java.util.LinkedList;
 
 // Class
-public class IO
+public class IO implements Runnable
 {
 	// Attributes
 	private Controller ctrl;
 
+	private Queue<Object>      buffer;
 	private ObjectOutputStream output;
-	private Object             buffer;
+	private ObjectInputStream  input ;
 
 
 	// Constructor
 	public IO(Controller ctrl, Socket s)
 	{
 		this.ctrl = ctrl;
-
 		try
 		{
-			this.output      = new ObjectOutputStream(s.getOutputStream());
-			new Listener(this, new ObjectInputStream (s.getInputStream ()));
+			this.buffer = new LinkedList<Object>();
+			this.output = new ObjectOutputStream(s.getOutputStream());
+			this.input  = new ObjectInputStream (s.getInputStream ());
 		}
 		catch (Exception e){ e.printStackTrace(); }
+		new Thread(this).start();
 	}
 
+
+	// Run methods
+	public void run()
+	{
+		try
+		{
+			while (true)
+				this.available(this.input.readObject());
+		}
+		catch (Exception e){ this.close(); }
+	}
+	
 	
 	// IO methods
 	public void send(Object o)
@@ -43,35 +59,19 @@ public class IO
 
 	public synchronized Object receive()
 	{
-		Object o = null;
-		try
-		{
-			this.wait  ();
-			o = this.buffer;
-			this.notify();
-		}
-		catch (Exception e){ e.printStackTrace(); }
-		return o;
+		if (this.buffer.peek() == null)
+			try{ this.wait(); } catch (Exception e){ e.printStackTrace(); }
+		return this.buffer.poll();
 	}
 
-	public synchronized void available(Object o)
+	private synchronized void available(Object o)
 	{
-		try
-		{
-			this.buffer = o;
-			this.notify();
-			this.wait(20);
-		}
-		catch (Exception e){ e.printStackTrace(); }
+		this.buffer.offer(o);
+		this.notify();
 	}
 
-	public void disconnected()
+	private void close()
 	{
-		try
-		{
-			this.output.close();
-		}
-		catch (Exception e){ e.printStackTrace(); }
 		this.ctrl.disconnected();
 	}
 }
