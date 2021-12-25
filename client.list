@@ -1,4 +1,5 @@
-./client/model/Client.java
+./client/model/Game.java
+./client/model/Player.java
 
 ./client/view/ViewCUI.java
 

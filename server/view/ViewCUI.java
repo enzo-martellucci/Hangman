@@ -23,10 +23,4 @@ public class ViewCUI
 	{
 		System.out.println(msg);
 	}
-
-	public String enterMessage()
-	{
-		System.out.print("Message : ");
-		return this.console.readLine();
-	}
 }

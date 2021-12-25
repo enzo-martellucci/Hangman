@@ -28,10 +28,6 @@ public class Server
 		this.lstConnected = new boolean[capacity];
 		this.nbPlayer = 0;
 	}
-	
-
-	// Getters
-	public String getLstIO(){ return Arrays.toString(this.lstPlayer); }
 
 
 	// Connection methods
@@ -47,6 +43,7 @@ public class Server
 			}
 		}
 		catch (Exception e){ e.printStackTrace(); }
+		this.sendToAll("START");
 		this.receiver.close();
 	}
 
@@ -66,6 +63,39 @@ public class Server
 		this.lstConnected[i] = false;
 		this.nbPlayer--;
 		this.notify();
+	}
+
+	// Init methods
+	public void initGame()
+	{
+		String   rawWord = "CALCULATRICE";
+		String[] lstName = new String[this.lstPlayer.length];
+
+		for (int i = 0; i < this.lstPlayer.length; i++)
+		{
+			this.lstPlayer[i].send(i);
+			lstName[i] = this.lstPlayer[i].getName();
+		}
+		
+		this.sendToAll(rawWord);
+		this.sendToAll(lstName);
+	}
+
+
+	// Play methods
+	public void play()
+	{
+		int player = 0;
+		while (this.nbPlayer != 0)
+		{
+			this.sendToAll(Arrays.copyOf(this.lstConnected, this.lstConnected.length));
+			this.sendToAll(player);
+			this.sendToAll(this.lstPlayer[player].receive());
+
+			do
+				player = (player + 1) % this.lstPlayer.length;
+			while (this.lstPlayer[player] == null && this.nbPlayer != 0);
+		}
 	}
 
 

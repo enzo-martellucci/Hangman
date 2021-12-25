@@ -18,6 +18,8 @@ public class Controller
 		this.view   = new ViewCUI();
 
 		this.waitPlayer();
+		this.initGame();
+		this.play();
 	}
 
 
@@ -25,7 +27,19 @@ public class Controller
 	private void waitPlayer()
 	{
 		this.server.waitPlayer();
-		this.view.print("All here : " + this.server.getLstIO());
+		this.view.print("All here, the game will start");
+	}
+
+	private void initGame()
+	{
+		this.server.initGame();
+		this.view.print("Game initialized");
+	}
+
+	private void play()
+	{
+		this.server.play();
+		this.view.print("All disconnected, server will shutdown");
 	}
 
 

@@ -53,7 +53,7 @@ public class IO implements Runnable
 	}
 
 
-	// Run methods
+	// Listening methods
 	public void run()
 	{
 		try
@@ -63,6 +63,12 @@ public class IO implements Runnable
 				this.available(this.input.readObject());
 		}
 		catch (Exception e){ this.close(); }
+	}
+
+	private synchronized void available(Object o)
+	{
+		this.buffer.offer(o);
+		this.notify();
 	}
 	
 	
@@ -83,14 +89,10 @@ public class IO implements Runnable
 		return this.buffer.poll();
 	}
 
-	private synchronized void available(Object o)
-	{
-		this.buffer.offer(o);
-		this.notify();
-	}
-
 	private void close()
 	{
+		if (this.name != null)
+			this.server.removePlayer(this);
 		try
 		{
 			this.available(null);
@@ -98,11 +100,5 @@ public class IO implements Runnable
 			this.output.close();
 		}
 		catch (Exception e){ e.printStackTrace(); }
-		if (this.name != null)
-			this.server.removePlayer(this);
 	}
-
-
-	// toString method
-	public String toString(){ return this.name; }
 }

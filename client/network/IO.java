@@ -19,6 +19,8 @@ public class IO implements Runnable
 	private ObjectOutputStream output;
 	private ObjectInputStream  input ;
 
+	private boolean waiting;
+
 
 	// Constructor
 	public IO(Controller ctrl, Socket s)
@@ -31,19 +33,33 @@ public class IO implements Runnable
 			this.input  = new ObjectInputStream (s.getInputStream ());
 		}
 		catch (Exception e){ e.printStackTrace(); }
+		this.waiting = true;
 		new Thread(this).start();
 	}
 
 
-	// Run methods
+	// Listening methods
 	public void run()
 	{
+		Object o;
 		try
 		{
 			while (true)
-				this.available(this.input.readObject());
+			{
+				o = this.input.readObject(); 
+				if (this.waiting)
+					this.available(o);
+				else
+					break;
+			}
 		}
-		catch (Exception e){ this.close(); }
+		catch (Exception e){ this.ctrl.disconnected(); }
+	}
+
+	private synchronized void available(Object o)
+	{
+		this.buffer.offer(o);
+		this.notify();
 	}
 	
 	
@@ -64,14 +80,5 @@ public class IO implements Runnable
 		return this.buffer.poll();
 	}
 
-	private synchronized void available(Object o)
-	{
-		this.buffer.offer(o);
-		this.notify();
-	}
-
-	private void close()
-	{
-		this.ctrl.disconnected();
-	}
+	public void close(){ this.waiting  = false; }
 }

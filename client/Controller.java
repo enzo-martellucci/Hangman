@@ -1,6 +1,6 @@
 // Architecture
 package hangmanc;
-import hangmanc.model.Client;
+import hangmanc.model.Game;
 import hangmanc.view.ViewCUI;
 import hangmanc.network.IO;
 
@@ -11,45 +11,81 @@ import java.net.Socket;
 public class Controller
 {
 	// Attributes
-	private Client  client;
-	private ViewCUI view  ;
-	private IO      io    ;
+	private Game    game;
+	private ViewCUI view;
+	private IO      io  ;
+
+	private int followed;
 
 
 	// Constructor
 	private Controller(Socket s)
 	{
-		this.client = new Client () ;
-		this.view   = new ViewCUI() ;
-		this.io     = new IO     (this, s);
+		this.game = new Game   () ;
+		this.view = new ViewCUI(this, this.game) ;
+		this.io   = new IO     (this, s);
 
-		this.sendName();
-		this.printMessage();
+		this.sendName  ();
+		this.waitPlayer();
+		this.initGame  ();
+		this.play      ();
+		this.io.close();
 	}
 
 
 	// Methods
 	private void sendName()
 	{
-		this.client.setName(this.view.enterName());
-		this.io.send(this.client.getName());
+		this.io.send(this.view.enterName());
 	}
 
-	private void printMessage()
+	private void waitPlayer()
 	{
-		String msg;
-
+		String msg = (String) this.io.receive();
 		do
 		{
-			msg = (String) this.io.receive();
 			this.view.print(msg);
+			msg = (String) this.io.receive();
 		}
-		while (true);
+		while (!msg.equals("START"));
+	}
+
+	private void initGame()
+	{
+		this.followed = (int) this.io.receive();
+
+		String   rawWord = (String  ) this.io.receive();
+		String[] lstName = (String[]) this.io.receive();
+
+		this.game.init(rawWord, lstName);
+	}
+
+	private void play()
+	{
+		Character letter;
+		while (!this.game.isOver())
+		{
+			this.game.majConnected((boolean[]) this.io.receive());
+			this.game.setPlayer   ((int      ) this.io.receive());
+			this.view.printGame();
+
+			if (this.game.getPlayer() == this.followed)
+				this.io.send(this.view.enterLetter());
+
+			letter = (Character) this.io.receive();
+			if (letter != null)
+				this.game.play(letter);
+		}
+
+		if (this.game.isWin())
+			this.view.print("You win !!!");
+		else
+			this.view.print("You loose =(");
 	}
 
 	public void disconnected()
 	{
-		System.out.println("Disconnected");
+		this.view.print("Disconnected");
 		System.exit(1);
 	}
 
