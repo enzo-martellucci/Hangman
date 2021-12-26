@@ -17,7 +17,7 @@ public class Game
 	private int       error;
 
 	private boolean gameOver;
-	private boolean win;
+	private boolean win     ;
 
 
 	// Constructor method

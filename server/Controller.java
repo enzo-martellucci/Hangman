@@ -8,7 +8,7 @@ public class Controller
 {
 	// Attributes
 	private Server  server;
-	private ViewCUI view;
+	private ViewCUI view  ;
 
 
 	// Constructor
@@ -20,26 +20,28 @@ public class Controller
 		this.waitPlayer();
 		this.initGame();
 		this.play();
+
+		this.view.print("All disconnected, server will stop");
 	}
 
 
 	// Methods
 	private void waitPlayer()
 	{
+		this.view.print("Waiting for players");
 		this.server.waitPlayer();
-		this.view.print("All here, the game will start");
 	}
 
 	private void initGame()
 	{
+		this.view.print("All here, sending initial infos");
 		this.server.initGame();
-		this.view.print("Game initialized");
 	}
 
 	private void play()
 	{
+		this.view.print("Everything ready, the game begins");
 		this.server.play();
-		this.view.print("All disconnected, server will shutdown");
 	}
 
 

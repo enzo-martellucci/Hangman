@@ -85,4 +85,9 @@ public class ViewCUI
 
 		System.out.println(state);
 	}
+
+	public void disconnected()
+	{
+		this.print(ViewCUI.CLEAR + "Disconnected");
+	}
 }

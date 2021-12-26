@@ -11,6 +11,7 @@ public class Player
 	// Attributes
 	private String  name;
 	private boolean connected;
+	
 	private List<Character> letterTried;
 
 

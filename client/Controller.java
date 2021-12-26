@@ -85,15 +85,12 @@ public class Controller
 	private void end()
 	{
 		this.view.printGame();
-		if (this.game.isWin())
-			this.view.print("You win !!!");
-		else
-			this.view.print("You loose =(");
+		this.view.print(this.game.isWin() ? "You win !!!" : "You loose =(");
 	}
 
 	public void disconnected()
 	{
-		this.view.print("\nDisconnected");
+		this.view.disconnected();
 		System.exit(1);
 	}
 

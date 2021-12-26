@@ -69,13 +69,11 @@ public class IO implements Runnable
 	public synchronized Object receive()
 	{
 		Object o;
-
 		if (this.buffer == null)
 			try{ this.wait(); } catch (Exception e){ e.printStackTrace(); }
 		o = this.buffer;
 		this.buffer = null;
 		this.notify();
-		
 		return o;
 	}
 
