@@ -6,8 +6,6 @@ import hangmanc.Controller;
 import java.net.Socket;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-import java.util.Queue;
-import java.util.LinkedList;
 
 // Class
 public class IO implements Runnable
@@ -15,7 +13,7 @@ public class IO implements Runnable
 	// Attributes
 	private Controller ctrl;
 
-	private Queue<Object>      buffer;
+	private Object             buffer;
 	private ObjectOutputStream output;
 	private ObjectInputStream  input ;
 
@@ -26,13 +24,14 @@ public class IO implements Runnable
 	public IO(Controller ctrl, Socket s)
 	{
 		this.ctrl = ctrl;
+
 		try
 		{
-			this.buffer = new LinkedList<Object>();
 			this.output = new ObjectOutputStream(s.getOutputStream());
 			this.input  = new ObjectInputStream (s.getInputStream ());
 		}
 		catch (Exception e){ e.printStackTrace(); }
+
 		this.running = true;
 		new Thread(this).start();
 	}
@@ -51,13 +50,9 @@ public class IO implements Runnable
 
 	private synchronized void available(Object o)
 	{
-		this.buffer.offer(o);
-		try
-		{
-			this.notify();
-			this.wait  ();
-		}
-		catch (Exception e){ e.printStackTrace(); }
+		this.buffer = o;
+		this.notify();
+		try{ this.wait(); } catch (Exception e){ e.printStackTrace(); }
 	}
 	
 	
@@ -74,10 +69,13 @@ public class IO implements Runnable
 	public synchronized Object receive()
 	{
 		Object o;
-		if (this.buffer.peek() == null)
+
+		if (this.buffer == null)
 			try{ this.wait(); } catch (Exception e){ e.printStackTrace(); }
-		o = this.buffer.poll();
+		o = this.buffer;
+		this.buffer = null;
 		this.notify();
+		
 		return o;
 	}
 

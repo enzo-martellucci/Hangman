@@ -6,8 +6,6 @@ import hangmans.model.Server;
 import java.net.Socket;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
-import java.util.Queue;
-import java.util.LinkedList;
 
 // Class
 public class IO implements Runnable
@@ -19,7 +17,7 @@ public class IO implements Runnable
 	// Attributes
 	private Server server;
 
-	private Queue<Object>      buffer;
+	private Object             buffer;
 	private ObjectOutputStream output;
 	private ObjectInputStream  input ;
 
@@ -30,13 +28,14 @@ public class IO implements Runnable
 	public IO(Server server, Socket s)
 	{
 		this.server = server;
+
 		try
 		{
-			this.buffer = new LinkedList<Object>();
 			this.output = new ObjectOutputStream(s.getOutputStream());
 			this.input  = new ObjectInputStream (s.getInputStream ());
 		}
 		catch (Exception e){ e.printStackTrace(); }
+
 		new Thread(this).start();
 	}
 
@@ -67,13 +66,9 @@ public class IO implements Runnable
 
 	private synchronized void available(Object o)
 	{
-		this.buffer.offer(o);
-		try
-		{
-			this.notify();
-			this.wait  ();
-		}
-		catch (Exception e){ e.printStackTrace(); }
+		this.buffer = o;
+		this.notify();
+		try{ this.wait(); } catch (Exception e){ e.printStackTrace(); }
 	}
 	
 	
@@ -90,10 +85,13 @@ public class IO implements Runnable
 	public synchronized Object receive()
 	{
 		Object o;
-		if (this.buffer.peek() == null)
+
+		if (this.buffer == null)
 			try{ this.wait(); } catch (Exception e){ e.printStackTrace(); }
-		o = this.buffer.poll();
+		o = this.buffer;
+		this.buffer = null;
 		this.notify();
+		
 		return o;
 	}
 
@@ -101,13 +99,9 @@ public class IO implements Runnable
 	{
 		if (this.name != null)
 			this.server.removePlayer(this);
-		this.notify();
 
-		try
-		{
-			this.input .close();
-			this.output.close();
-		}
+		this.notify();
+		try { this.input .close(); this.output.close(); }
 		catch (Exception e){ e.printStackTrace(); }
 	}
 }
