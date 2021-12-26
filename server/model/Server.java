@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import java.util.Scanner;
+import java.io.FileInputStream;
+
 // Class
 public class Server
 {
@@ -68,7 +71,7 @@ public class Server
 	// Init methods
 	public void initGame()
 	{
-		String   rawWord = "TEST";
+		String   rawWord = Server.randomWord();
 		String[] lstName = new String[this.lstPlayer.length];
 
 		for (int i = 0; i < this.lstPlayer.length; i++)
@@ -114,5 +117,17 @@ public class Server
 		int i = 0;
 		while (array[i] != target) i++;
 		return i;
+	}
+
+	private static String randomWord()
+	{
+		List<String> lstWord = new ArrayList<String>();
+		try(Scanner sc = new Scanner(new FileInputStream("wordlist.txt")))
+		{
+			while (sc.hasNext())
+				lstWord.add(sc.nextLine());
+		}
+		catch (Exception e){ e.printStackTrace(); }
+		return lstWord.get((int)(Math.random() * lstWord.size()));
 	}
 }

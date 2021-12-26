@@ -99,7 +99,7 @@ public class IO implements Runnable
 			this.server.removePlayer(this);
 
 		this.notify();
-		try { this.input .close(); this.output.close(); }
+		try { this.input.close(); this.output.close(); }
 		catch (Exception e){ e.printStackTrace(); }
 	}
 }
