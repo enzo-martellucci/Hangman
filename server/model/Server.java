@@ -68,7 +68,7 @@ public class Server
 	// Init methods
 	public void initGame()
 	{
-		String   rawWord = "CALCULATRICE";
+		String   rawWord = "TEST";
 		String[] lstName = new String[this.lstPlayer.length];
 
 		for (int i = 0; i < this.lstPlayer.length; i++)

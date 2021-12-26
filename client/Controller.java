@@ -29,6 +29,8 @@ public class Controller
 		this.waitPlayer();
 		this.initGame  ();
 		this.play      ();
+		this.end       ();
+
 		this.io.close();
 	}
 
@@ -71,12 +73,18 @@ public class Controller
 
 			if (this.game.getPlayer() == this.followed)
 				this.io.send(this.view.enterLetter());
+			else
+				this.view.print("Waiting others to play");
 
 			letter = (Character) this.io.receive();
 			if (letter != null)
 				this.game.play(letter);
 		}
+	}
 
+	private void end()
+	{
+		this.view.printGame();
 		if (this.game.isWin())
 			this.view.print("You win !!!");
 		else
@@ -85,7 +93,7 @@ public class Controller
 
 	public void disconnected()
 	{
-		this.view.print("Disconnected");
+		this.view.print("\nDisconnected");
 		System.exit(1);
 	}
 

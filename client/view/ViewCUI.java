@@ -67,7 +67,7 @@ public class ViewCUI
 
 		for (int i = 0; i < lstPlayer.length; i++)
 		{
-			state += String.format("%s %20s %s %s : ", (i == player ? "->" : "  "), lstPlayer[i].getName(), (lstPlayer[i].isConnected() ? ViewCUI.CONNECTED : ViewCUI.DISCONNECTED), ViewCUI.RESET );
+			state += String.format("%s %-20s %s %s : ", (i == player ? "->" : "  "), lstPlayer[i].getName(), (lstPlayer[i].isConnected() ? ViewCUI.CONNECTED : ViewCUI.DISCONNECTED), ViewCUI.RESET );
 			for (Character c : lstPlayer[i].getLetterTried())
 				state += c + " ";
 			state += "\n";
