@@ -25,7 +25,7 @@ public class IO implements Runnable
 
 
 	// Constructor
-	public IO(Server server, Socket s)
+	IO(Server server, Socket s)
 	{
 		this.server = server;
 
@@ -45,7 +45,7 @@ public class IO implements Runnable
 
 
 	// Setters
-	public void setName(String name)
+	private void setName(String name)
 	{
 		this.name = name.equals("") ? "Anonymous" + IO.SEQ_NUM++ : name;
 		this.server.addPlayer(this);

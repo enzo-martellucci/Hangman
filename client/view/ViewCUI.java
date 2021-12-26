@@ -11,10 +11,10 @@ import java.io.Console;
 public class ViewCUI
 {
 	// Constants
-	public static final String CLEAR        = "\033[H\033[2J";
-	public static final String RESET        = "\u001B[0m"    ;
-	public static final String CONNECTED    = "\u001B[42m"   ;
-	public static final String DISCONNECTED = "\u001B[41m"   ;
+	private static final String CLEAR        = "\033[H\033[2J";
+	private static final String RESET        = "\u001B[0m"    ;
+	private static final String CONNECTED    = "\u001B[42m"   ;
+	private static final String DISCONNECTED = "\u001B[41m"   ;
 
 	// Attributes
 	private Controller ctrl;

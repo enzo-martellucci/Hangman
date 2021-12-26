@@ -16,7 +16,7 @@ public class Player
 
 
 	// Constructor
-	public Player(String name)
+	Player(String name)
 	{
 		this.name      = name;
 		this.connected = true;
@@ -32,12 +32,12 @@ public class Player
 
 
 	// Methods
-	public void setConnected(boolean connected)
+	void setConnected(boolean connected)
 	{
 		this.connected = connected;
 	}
 	
-	public void addLetter(char letter)
+	void addLetter(char letter)
 	{
 		this.letterTried.add(letter);
 	}

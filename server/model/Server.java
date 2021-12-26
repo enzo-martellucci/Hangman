@@ -100,7 +100,7 @@ public class Server
 
 
 	// IO methods
-	public void sendToAll(Object o)
+	private void sendToAll(Object o)
 	{
 		for (int i = 0; i < this.lstPlayer.length; i++)
 			if (this.lstConnected[i])
