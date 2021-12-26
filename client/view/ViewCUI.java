@@ -47,8 +47,15 @@ public class ViewCUI
 
 	public char enterLetter()
 	{
-		System.out.print("Enter letter : ");
-		return Character.toUpperCase(this.console.readLine().charAt(0));
+		String letter;
+		do
+		{
+			System.out.print("Enter letter : ");
+			letter = this.console.readLine();
+		}
+		while (letter.length() != 1 || !Character.isLetterOrDigit(letter.charAt(0)));
+
+		return Character.toUpperCase(letter.charAt(0));
 	}
 
 	public void printGame()

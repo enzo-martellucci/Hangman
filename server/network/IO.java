@@ -68,7 +68,12 @@ public class IO implements Runnable
 	private synchronized void available(Object o)
 	{
 		this.buffer.offer(o);
-		this.notify();
+		try
+		{
+			this.notify();
+			this.wait  ();
+		}
+		catch (Exception e){ e.printStackTrace(); }
 	}
 	
 	
@@ -84,18 +89,22 @@ public class IO implements Runnable
 
 	public synchronized Object receive()
 	{
+		Object o;
 		if (this.buffer.peek() == null)
 			try{ this.wait(); } catch (Exception e){ e.printStackTrace(); }
-		return this.buffer.poll();
+		o = this.buffer.poll();
+		this.notify();
+		return o;
 	}
 
-	private void close()
+	private synchronized void close()
 	{
 		if (this.name != null)
 			this.server.removePlayer(this);
+		this.notify();
+
 		try
 		{
-			this.available(null);
 			this.input .close();
 			this.output.close();
 		}
