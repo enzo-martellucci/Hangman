@@ -79,6 +79,8 @@ public class IO implements Runnable
 
 	public synchronized void close()
 	{
+		if (this.buffer == null)
+			try{ this.wait(); } catch (Exception e){ e.printStackTrace(); }
 		this.running = false;
 		this.notify();
 	}

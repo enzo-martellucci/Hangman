@@ -79,7 +79,7 @@ public class IO implements Runnable
 		{
 			this.output.writeObject(o);
 		}
-		catch (Exception e){ e.printStackTrace(); }
+		catch (Exception e){}
 	}
 
 	public synchronized Object receive()
@@ -99,7 +99,7 @@ public class IO implements Runnable
 			this.server.removePlayer(this);
 
 		this.notify();
-		try { this.input.close(); this.output.close(); }
+		try { this.input.close(); }
 		catch (Exception e){ e.printStackTrace(); }
 	}
 }
