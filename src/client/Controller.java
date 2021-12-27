@@ -100,7 +100,7 @@ public class Controller
 	{
 		try
 		{
-			new Controller(new Socket("localhost", 6000));
+			new Controller(new Socket(args[0], Integer.parseInt(args[1])));
 		}
 		catch (Exception e){ e.printStackTrace(); }
 	}

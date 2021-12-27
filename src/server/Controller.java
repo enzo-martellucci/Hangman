@@ -48,6 +48,6 @@ public class Controller
 	// Main
 	public static void main(String[] args)
 	{
-		new Controller(6000, 3);
+		new Controller(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
 	}
 }
